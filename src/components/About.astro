@@ -1,0 +1,55 @@
+---
+import { toLocale, useTranslations } from "../i18n";
+
+const t = useTranslations(toLocale(Astro.currentLocale));
+---
+
+<section class="about section" id="about">
+  <div class="about__grid container reveal">
+    <h2 class="section-title display">{t.about.heading}</h2>
+    <div class="about__text">
+      <p class="about__statement" set:html={t.about.statement}></p>
+      <p class="about__detail">{t.about.detail}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    border-top: 1px solid var(--line);
+    background: linear-gradient(180deg, #0b1030 0%, var(--void) 100%);
+  }
+
+  .about__grid {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .about__statement {
+    max-width: 24em;
+    color: var(--text-soft);
+    font-size: clamp(1.5rem, 3.3vw, 2.375rem);
+    font-weight: 600;
+    line-height: 1.34;
+    letter-spacing: -0.01em;
+  }
+
+  .about__statement :global(strong) {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .about__detail {
+    max-width: 38em;
+    margin-top: clamp(1.25rem, 3vw, 2rem);
+    color: var(--text-dim);
+    font-size: 1.0625rem;
+  }
+
+  @media (min-width: 56rem) {
+    .about__grid {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      align-items: start;
+    }
+  }
+</style>

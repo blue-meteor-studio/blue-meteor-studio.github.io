@@ -1,0 +1,58 @@
+---
+// Line drawings for a game's features. Decoration: the feature's title says what each one means.
+import type { FeatureIconName } from "../data/games";
+
+interface Props {
+  name: FeatureIconName;
+}
+
+const { name } = Astro.props;
+---
+
+<svg
+  class="feature-icon"
+  width="28"
+  height="28"
+  viewBox="0 0 28 28"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {
+    name === "collide" && (
+      <>
+        <circle cx="8.75" cy="17" r="5.5" />
+        <circle cx="19.25" cy="17" r="5.5" />
+        <path d="M14 8.5v-4M10.6 9.4 8.9 6.6M17.4 9.4l1.7-2.8" />
+      </>
+    )
+  }
+  {
+    name === "health" && (
+      <>
+        <circle cx="14" cy="14" r="10.25" />
+        <path d="M14 19s-4.75-2.9-4.75-6.1a2.6 2.6 0 0 1 4.75-1.45 2.6 2.6 0 0 1 4.75 1.45C18.75 16.1 14 19 14 19Z" />
+      </>
+    )
+  }
+  {
+    name === "gems" && (
+      <>
+        <path d="M8 9l5 5-5 5-5-5zM20 9l5 5-5 5-5-5z" />
+        <path d="M13 14h2" />
+      </>
+    )
+  }
+  {
+    name === "browser" && (
+      <>
+        <path d="M3 5h22v18H3zM3 10h22" />
+        <path d="M12 13.75v5.5l4.75-2.75z" />
+      </>
+    )
+  }
+</svg>

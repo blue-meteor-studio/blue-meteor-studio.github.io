@@ -1,0 +1,134 @@
+---
+// Every page's shell: the head (titles, the page's other languages, sharing cards), the header and the footer.
+import { Font } from "astro:assets";
+import { getAbsoluteLocaleUrl, getRelativeLocaleUrl } from "astro:i18n";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import { defaultLocale, locales, ogLocales, site, toLocale, useTranslations } from "../i18n";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** The page's path inside a language, "" for the home page. */
+  path?: string;
+  /** False for a page that exists once, not once per language (the 404 page). */
+  translated?: boolean;
+  noindex?: boolean;
+}
+
+const locale = toLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const {
+  title = `${t.meta.title} | ${t.meta.titleSuffix}`,
+  description = t.meta.description,
+  path = "",
+  translated = true,
+  noindex = false,
+} = Astro.props;
+
+const canonical = getAbsoluteLocaleUrl(locale, path);
+const shareImage = new URL("/og.png", Astro.site).href;
+
+// Where this page is in the other languages, for a visitor whose browser asks for one of them.
+const others = Object.fromEntries(
+  locales.filter((code) => code !== defaultLocale).map((code) => [code, getRelativeLocaleUrl(code, path)]),
+);
+
+const organization = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: site.name,
+  url: `${site.url}/`,
+  logo: `${site.url}/icon-512.png`,
+  description: t.meta.description,
+  sameAs: [site.github],
+};
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {
+      translated && (
+        <>
+          <link rel="canonical" href={canonical} />
+          {locales.map((code) => <link rel="alternate" hreflang={code} href={getAbsoluteLocaleUrl(code, path)} />)}
+          <link rel="alternate" hreflang="x-default" href={getAbsoluteLocaleUrl(defaultLocale, path)} />
+        </>
+      )
+    }
+
+    <meta name="theme-color" content="#080a18" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={site.name} />
+    <meta property="og:locale" content={ogLocales[locale]} />
+    {
+      translated &&
+        locales
+          .filter((code) => code !== locale)
+          .map((code) => <meta property="og:locale:alternate" content={ogLocales[code]} />)
+    }
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <Font cssVariable="--font-barlow-condensed" preload={[{ weight: 800, style: "italic" }]} />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(organization)} />
+
+    {
+      /* The root pages are English. A visitor whose browser asks first for another of the site's languages
+         is sent to that one, unless they have chosen a language here before (the language switch). */
+      translated && locale === defaultLocale && (
+        <script is:inline define:vars={{ others, fallback: defaultLocale }}>
+          try {
+            var want = localStorage.getItem("lang");
+            if (!want) {
+              var asked = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ""];
+              for (var i = 0; i < asked.length && !want; i++) {
+                var code = String(asked[i]).toLowerCase().split("-")[0];
+                if (code === fallback || others[code]) want = code;
+              }
+            }
+            if (want && others[want]) location.replace(others[want] + location.search + location.hash);
+          } catch (error) {}
+        </script>
+      )
+    }
+  </head>
+  <body>
+    <a class="skip" href="#main">{t.a11y.skip}</a>
+    <Header path={path} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer path={path} />
+
+    <script is:inline>
+      // The language a visitor picks is remembered: see the redirect in the head.
+      document.addEventListener("click", function (event) {
+        var link = event.target instanceof Element ? event.target.closest("a[data-lang]") : null;
+        if (!link) return;
+        try {
+          localStorage.setItem("lang", link.getAttribute("data-lang"));
+        } catch (error) {}
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+---
+import GameFeature from "./GameFeature.astro";
+import GameTeaser from "./GameTeaser.astro";
+import { games } from "../data/games";
+import { toLocale, useTranslations } from "../i18n";
+
+const t = useTranslations(toLocale(Astro.currentLocale));
+---
+
+<section class="games section" id="games">
+  <div class="container">
+    <header class="games__head reveal">
+      <h2 class="section-title display">{t.games.heading}</h2>
+      <p class="games__intro">{t.games.intro}</p>
+    </header>
+    <div class="games__list">
+      {
+        /* A game with pictures is shown in full; one without, as a card. */
+        games.map((game) => (game.shots ? <GameFeature game={game} /> : <GameTeaser game={game} />))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .games {
+    border-top: 1px solid var(--line);
+  }
+
+  .games__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem 2rem;
+    margin-bottom: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .games__intro {
+    color: var(--text-dim);
+  }
+
+  .games__list {
+    display: grid;
+    gap: clamp(3rem, 7vw, 5rem);
+  }
+</style>

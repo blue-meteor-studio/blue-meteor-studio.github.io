@@ -1,0 +1,453 @@
+---
+// The top of the page: the studio's name over a night sky, a blue meteor coming down on an arena floor.
+// Everything drawn here is decoration (aria-hidden); the words are the content.
+import { games } from "../data/games";
+import { toLocale, useTranslations } from "../i18n";
+
+const locale = toLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+
+// The stars are placed by a seeded generator, so every build draws the same sky.
+function mulberry32(seed: number) {
+  return () => {
+    seed |= 0;
+    seed = (seed + 0x6d2b79f5) | 0;
+    let n = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    n = (n + Math.imul(n ^ (n >>> 7), 61 | n)) ^ n;
+    return ((n ^ (n >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const random = mulberry32(20261124);
+const stars = Array.from({ length: 120 }, () => {
+  const size = random();
+  return {
+    x: Math.round(random() * 16000) / 10,
+    y: Math.round(random() ** 1.35 * 9000) / 10, // more of them high in the sky
+    r: size > 0.93 ? 1.9 : size > 0.7 ? 1.3 : 0.8,
+    o: Math.round((0.35 + random() * 0.6) * 100) / 100,
+    twinkle: random() < 0.34 ? 1 + Math.floor(random() * 3) : 0,
+  };
+});
+---
+
+<section class="hero" id="top">
+  <div class="hero__art" aria-hidden="true">
+    <svg class="hero__stars" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" focusable="false">
+      {
+        stars.map((star) => (
+          <circle
+            class={star.twinkle ? `tw tw${star.twinkle}` : undefined}
+            cx={star.x}
+            cy={star.y}
+            r={star.r}
+            fill="#c9d6ff"
+            opacity={star.o}
+          />
+        ))
+      }
+    </svg>
+
+    <span class="hero__streak hero__streak--a"></span>
+    <span class="hero__streak hero__streak--b"></span>
+    <span class="hero__streak hero__streak--c"></span>
+
+    <div class="hero__floor">
+      <div class="hero__grid"></div>
+    </div>
+    <div class="hero__horizon"></div>
+
+    <div class="hero__meteor">
+      <!-- Still: drawn once. The blurred tails would be costly to redraw every frame. -->
+      <svg viewBox="0 0 800 560" focusable="false">
+        <defs>
+          <filter id="hero-blur-wide" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="26"></feGaussianBlur>
+          </filter>
+          <filter id="hero-blur" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="7"></feGaussianBlur>
+          </filter>
+          <filter id="hero-blur-fine" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2.5"></feGaussianBlur>
+          </filter>
+          <linearGradient id="hero-tail" gradientUnits="userSpaceOnUse" x1="250" y1="380" x2="830" y2="12">
+            <stop offset="0" stop-color="#6c9bff"></stop>
+            <stop offset=".3" stop-color="#4674f2" stop-opacity=".62"></stop>
+            <stop offset=".72" stop-color="#2d5be0" stop-opacity=".2"></stop>
+            <stop offset="1" stop-color="#1d4ed8" stop-opacity="0"></stop>
+          </linearGradient>
+          <linearGradient id="hero-tail-core" gradientUnits="userSpaceOnUse" x1="250" y1="380" x2="640" y2="132">
+            <stop offset="0" stop-color="#ffffff"></stop>
+            <stop offset=".3" stop-color="#a5e2ff" stop-opacity=".8"></stop>
+            <stop offset="1" stop-color="#6fd3ff" stop-opacity="0"></stop>
+          </linearGradient>
+          <radialGradient id="hero-glow" gradientUnits="userSpaceOnUse" cx="250" cy="380" r="250">
+            <stop offset="0" stop-color="#6c9bff" stop-opacity=".62"></stop>
+            <stop offset=".4" stop-color="#3d6df0" stop-opacity=".2"></stop>
+            <stop offset="1" stop-color="#1d4ed8" stop-opacity="0"></stop>
+          </radialGradient>
+          <radialGradient id="hero-head" gradientUnits="userSpaceOnUse" cx="238" cy="392" r="74">
+            <stop offset="0" stop-color="#ffffff"></stop>
+            <stop offset=".3" stop-color="#d2ecff"></stop>
+            <stop offset=".66" stop-color="#77a3ff"></stop>
+            <stop offset="1" stop-color="#3f70ea"></stop>
+          </radialGradient>
+        </defs>
+        <circle cx="250" cy="380" r="250" fill="url(#hero-glow)"></circle>
+        <path d="M204.9 309.13 830 12 295.1 450.87Z" fill="url(#hero-tail)" opacity=".55" filter="url(#hero-blur-wide)"></path>
+        <path d="M219.93 332.75 830 12 280.07 427.25Z" fill="url(#hero-tail)" filter="url(#hero-blur)"></path>
+        <path d="M237.11 359.75 640 132 262.89 400.25Z" fill="url(#hero-tail-core)" filter="url(#hero-blur-fine)"></path>
+        <circle cx="250" cy="380" r="56" fill="url(#hero-head)"></circle>
+        <ellipse cx="229" cy="355" rx="15" ry="9" transform="rotate(-35 229 355)" fill="#fff" opacity=".5"></ellipse>
+      </svg>
+      <!-- Moving: sparks that fall behind along the tail. -->
+      <svg class="hero__sparks" viewBox="0 0 800 560" focusable="false">
+        <g fill="#d2ecff">
+          <circle class="spark spark--1" cx="388.4" cy="318.1" r="3.6"></circle>
+          <circle class="spark spark--2" cx="442.8" cy="235.9" r="2.8"></circle>
+          <circle class="spark spark--3" cx="534.8" cy="212.9" r="2.3"></circle>
+          <circle class="spark spark--4" cx="607.4" cy="140.7" r="1.9"></circle>
+          <circle class="spark spark--5" cx="691.9" cy="105.9" r="1.5"></circle>
+        </g>
+      </svg>
+    </div>
+
+    <div class="hero__shade"></div>
+  </div>
+
+  <div class="hero__content container">
+    <h1 class="hero__title display" lang="en">
+      <span>Blue</span> <span class="accent">Meteor</span> <span>Studio</span>
+    </h1>
+    <p class="hero__lead">{t.hero.lead}</p>
+    <div class="hero__actions">
+      <a class="button button--primary" href="#games">{t.hero.cta}</a>
+    </div>
+    <p class="hero__now">
+      <span class="chip">{t.hero.nowLabel}</span>
+      <span class="hero__now-list" lang="en">
+        {games.map((game) => <a href={`#${game.id}`}>{game.title}</a>)}
+      </span>
+    </p>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    align-items: end;
+    min-height: clamp(34rem, 100svh, 60rem);
+    /* The sky runs up behind the header. */
+    margin-top: calc(var(--header-h) * -1);
+    padding-top: calc(var(--header-h) + 2rem);
+    padding-bottom: clamp(2.5rem, 8svh, 5.5rem);
+    overflow: clip;
+    background:
+      radial-gradient(90% 70% at 78% 8%, rgb(29 78 216 / 0.22), transparent 62%),
+      linear-gradient(180deg, #060815 0%, var(--void) 55%, #0b1030 100%);
+  }
+
+  .hero__art {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: clip;
+  }
+
+  .hero__stars {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .tw {
+    animation: twinkle 4.6s ease-in-out infinite;
+  }
+
+  .tw2 {
+    animation-duration: 6.2s;
+    animation-delay: -2.1s;
+  }
+
+  .tw3 {
+    animation-duration: 7.8s;
+    animation-delay: -4.4s;
+  }
+
+  @keyframes twinkle {
+    50% {
+      opacity: 0.12;
+    }
+  }
+
+  /* Thin streaks cross the sky now and then, the way the meteor came. */
+  .hero__streak {
+    position: absolute;
+    width: 9rem;
+    height: 2px;
+    background: linear-gradient(90deg, var(--frost), transparent);
+    opacity: 0;
+    rotate: -32.5deg;
+    animation: streak 13s linear infinite;
+  }
+
+  .hero__streak--a {
+    left: 62%;
+    top: 14%;
+    animation-delay: 2.5s;
+  }
+
+  .hero__streak--b {
+    left: 34%;
+    top: 9%;
+    width: 6rem;
+    animation-delay: 7s;
+  }
+
+  .hero__streak--c {
+    left: 88%;
+    top: 30%;
+    width: 7rem;
+    animation-delay: 10.5s;
+  }
+
+  @keyframes streak {
+    0% {
+      opacity: 0;
+      translate: 9rem -5.7rem;
+    }
+    1.5% {
+      opacity: 0.9;
+    }
+    7% {
+      opacity: 0;
+      translate: -13rem 8.3rem;
+    }
+    100% {
+      opacity: 0;
+      translate: -13rem 8.3rem;
+    }
+  }
+
+  /* The arena floor: a lit grid that runs to the horizon. */
+  .hero__floor {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 38%;
+    overflow: clip;
+    perspective: 26rem;
+    perspective-origin: 50% 0%;
+    mask-image: linear-gradient(180deg, transparent 0%, #000 34%, #000 100%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 34%, #000 100%);
+  }
+
+  .hero__grid {
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 250%;
+    height: 420%;
+    transform-origin: 50% 0%;
+    transform: rotateX(74deg);
+    background-image:
+      linear-gradient(90deg, rgb(91 140 255 / 0.55) 2px, transparent 2px),
+      linear-gradient(180deg, rgb(91 140 255 / 0.55) 2px, transparent 2px);
+    background-size: 5.5rem 5.5rem;
+    background-position: 50% 0;
+    animation: floor 4s linear infinite;
+  }
+
+  @keyframes floor {
+    to {
+      background-position: 50% 5.5rem;
+    }
+  }
+
+  .hero__horizon {
+    position: absolute;
+    inset: auto 0 38% 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(111 211 255 / 0.55) 30%, rgb(111 211 255 / 0.55) 70%, transparent);
+    box-shadow: 0 0 2.5rem 0.6rem rgb(91 140 255 / 0.22);
+  }
+
+  .hero__meteor {
+    position: absolute;
+    top: 4%;
+    right: -6%;
+    width: min(64vw, 56rem);
+    aspect-ratio: 800 / 560;
+    animation:
+      arrive 1.3s var(--ease-out) both,
+      hover 5s ease-in-out 1.3s infinite alternate;
+  }
+
+  .hero__meteor svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* It comes in along its own tail: 800 across and 509 down for every 800 of its width. */
+  @keyframes arrive {
+    from {
+      opacity: 0;
+      translate: 60% -54.5%;
+    }
+  }
+
+  @keyframes hover {
+    to {
+      translate: 1.2% -1.1%;
+    }
+  }
+
+  .spark {
+    transform-box: fill-box;
+    animation: spark 2.4s linear infinite;
+  }
+
+  .spark--2 {
+    animation-delay: -0.5s;
+    animation-duration: 2.9s;
+  }
+
+  .spark--3 {
+    animation-delay: -1.3s;
+  }
+
+  .spark--4 {
+    animation-delay: -0.9s;
+    animation-duration: 3.2s;
+  }
+
+  .spark--5 {
+    animation-delay: -1.9s;
+  }
+
+  @keyframes spark {
+    from {
+      opacity: 0;
+      translate: -42px 27px;
+    }
+    25% {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+      translate: 64px -41px;
+    }
+  }
+
+  /* Darkens the floor under the words. */
+  .hero__shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgb(8 10 24 / 0.82) 0%, rgb(8 10 24 / 0.45) 42%, transparent 68%),
+      linear-gradient(0deg, rgb(8 10 24 / 0.7) 0%, transparent 26%);
+  }
+
+  .hero__title {
+    /* As large as the window allows, in both directions: the whole hero fits the first screen. */
+    font-size: clamp(4.5rem, min(22vw, 17.5svh), 11rem);
+    line-height: 0.84;
+    letter-spacing: -0.005em;
+    text-shadow: 0 0.04em 0.5em rgb(8 10 24 / 0.6);
+  }
+
+  .hero__title span {
+    display: block;
+  }
+
+  .hero__lead {
+    margin-top: clamp(1.25rem, 3vw, 2rem);
+    color: var(--text);
+    font-size: clamp(1.25rem, 2.6vw, 1.75rem);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: clamp(1.75rem, 4vw, 2.5rem);
+    /* Room for the button's frame. */
+    padding-left: 6px;
+  }
+
+  .hero__now {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.9rem;
+    margin-top: clamp(1.5rem, 4.5svh, 3rem);
+  }
+
+  .hero__now-list {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 1.4rem;
+    color: var(--text-soft);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.0625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .hero__now-list a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  /* Every name has its own mark, so none is left hanging where the line breaks. */
+  .hero__now-list a::before {
+    content: "";
+    flex: none;
+    width: 0.4em;
+    height: 0.4em;
+    background: var(--azure);
+  }
+
+  .hero__now-list a:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+
+  @media (max-width: 47.99rem) {
+    .hero {
+      /* The meteor has the sky above the words to itself. */
+      --hero-sky: clamp(7rem, 24svh, 15rem);
+      padding-top: calc(var(--header-h) + var(--hero-sky));
+    }
+
+    /* 150vw wide, so 105vw tall, and its head ends 77.86% of the way down: placed so that the head
+       stops just short of the first word, whatever the window's height. */
+    .hero__meteor {
+      top: calc(var(--header-h) + var(--hero-sky) - 81.75vw - 0.75rem);
+      right: -50%;
+      width: 150vw;
+    }
+
+    .hero__shade {
+      background: linear-gradient(0deg, rgb(8 10 24 / 0.88) 0%, rgb(8 10 24 / 0.5) 34%, transparent 62%);
+    }
+
+    .hero__floor {
+      height: 30%;
+    }
+
+    .hero__horizon {
+      bottom: 30%;
+    }
+  }
+</style>

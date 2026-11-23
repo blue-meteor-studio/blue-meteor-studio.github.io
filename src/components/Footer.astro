@@ -1,0 +1,156 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import LanguageSwitch from "./LanguageSwitch.astro";
+import Logo from "./Logo.astro";
+import { games } from "../data/games";
+import { site, toLocale, useTranslations } from "../i18n";
+
+interface Props {
+  /** The page's path inside a language, for the language switch. */
+  path?: string;
+}
+
+const { path = "" } = Astro.props;
+const locale = toLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const home = getRelativeLocaleUrl(locale, "");
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="footer__grid container">
+    <div class="footer__brand">
+      <a class="footer__logo" href={`${home}#top`} aria-label={t.a11y.home}>
+        <Logo size={36} class="footer__mark" />
+        <span class="footer__name display" lang="en">{site.name}</span>
+      </a>
+      <p class="footer__tagline">{t.footer.tagline}</p>
+    </div>
+
+    <nav class="footer__nav" aria-labelledby="footer-site">
+      <h2 class="label" id="footer-site">{t.footer.site}</h2>
+      <ul>
+        <li><a href={`${home}#about`}>{t.nav.about}</a></li>
+        <li><a href={`${home}#games`}>{t.nav.games}</a></li>
+      </ul>
+    </nav>
+
+    <nav class="footer__nav" aria-labelledby="footer-games">
+      <h2 class="label" id="footer-games">{t.footer.games}</h2>
+      <ul lang="en">
+        {games.map((game) => <li><a href={`${home}#${game.id}`}>{game.title}</a></li>)}
+      </ul>
+    </nav>
+
+    <nav class="footer__nav" aria-labelledby="footer-elsewhere">
+      <h2 class="label" id="footer-elsewhere">{t.footer.elsewhere}</h2>
+      <ul>
+        <li>
+          <a href={site.github} target="_blank" rel="noopener me">
+            GitHub
+            <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M5 3h8v8M13 3 3 13" />
+            </svg>
+            <span class="sr-only">({t.a11y.newTab})</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="footer__bottom container">
+    <p class="footer__copy">© {year} {site.name}. {t.footer.rights}</p>
+    <LanguageSwitch path={path} full />
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--line);
+    background: #060815;
+    padding-top: clamp(3rem, 7vw, 5rem);
+    padding-bottom: 2rem;
+    font-size: 0.9375rem;
+  }
+
+  .footer__grid {
+    display: grid;
+    gap: 2.5rem 2rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer__brand {
+    grid-column: 1 / -1;
+  }
+
+  .footer__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .footer__logo :global(.footer__mark) {
+    color: var(--azure);
+    flex: none;
+  }
+
+  .footer__name {
+    font-size: 1.75rem;
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+
+  .footer__tagline {
+    margin-top: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .footer__nav ul {
+    display: grid;
+    gap: 0.15rem;
+    margin-top: 0.75rem;
+  }
+
+  .footer__nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.25rem;
+    color: var(--text-soft);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .footer__nav a:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .footer__copy {
+    color: var(--text-dim);
+    font-size: 0.875rem;
+  }
+
+  @media (min-width: 48rem) {
+    .footer__grid {
+      grid-template-columns: minmax(0, 2.2fr) repeat(3, minmax(0, 1fr));
+    }
+
+    .footer__brand {
+      grid-column: auto;
+    }
+  }
+</style>

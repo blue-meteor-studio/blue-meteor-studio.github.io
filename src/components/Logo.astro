@@ -1,0 +1,24 @@
+---
+// The studio's mark: a blue meteor. It takes its colour from the text colour around it.
+interface Props {
+  size?: number;
+  class?: string;
+}
+
+const { size = 32, class: className } = Astro.props;
+---
+
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  fill="none"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d="M12.81 32.81 60 4 31.19 51.19Z" fill="currentColor" opacity=".38"></path>
+  <path d="M17.05 37.05 48 16 26.95 46.95Z" fill="currentColor" opacity=".6"></path>
+  <circle cx="22" cy="42" r="13" fill="currentColor"></circle>
+  <circle cx="17.5" cy="37.5" r="4" fill="#fff" opacity=".6"></circle>
+</svg>

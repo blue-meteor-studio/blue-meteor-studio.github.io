@@ -1,0 +1,57 @@
+---
+// GitHub Pages serves this one file for every address that is not a page, so it speaks both languages.
+import { getRelativeLocaleUrl } from "astro:i18n";
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Page not found | Blue Meteor Studio" translated={false} noindex>
+  <section class="missing">
+    <div class="container">
+      <p class="missing__code display" aria-hidden="true">404</p>
+      <h1 class="missing__title display">Page not found</h1>
+      <p class="missing__text">There is no page at this address.</p>
+      <p class="missing__text" lang="ko">이 주소에는 페이지가 없습니다.</p>
+      <div class="missing__actions">
+        <a class="button button--primary" href={getRelativeLocaleUrl("en", "")} data-lang="en">Home</a>
+        <a class="button button--primary" href={getRelativeLocaleUrl("ko", "")} lang="ko" data-lang="ko">홈으로</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .missing {
+    display: grid;
+    align-items: center;
+    min-height: calc(100svh - var(--header-h));
+    padding-block: 4rem;
+  }
+
+  .missing__code {
+    color: var(--azure);
+    font-size: clamp(6rem, 30vw, 14rem);
+    line-height: 0.8;
+  }
+
+  .missing__title {
+    margin-top: 1.5rem;
+    font-size: clamp(2.25rem, 7vw, 4rem);
+  }
+
+  .missing__text {
+    margin-top: 1rem;
+    color: var(--text-soft);
+  }
+
+  .missing__text + .missing__text {
+    margin-top: 0.25rem;
+  }
+
+  .missing__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.75rem;
+    margin-top: 2.5rem;
+    padding-left: 6px;
+  }
+</style>

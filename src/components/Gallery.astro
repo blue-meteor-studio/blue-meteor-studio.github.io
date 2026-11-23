@@ -1,0 +1,174 @@
+---
+// A game's screenshots: one large picture and a row of small ones that choose it.
+// Without scripts the small ones are plain links to the full pictures.
+import { Image, getImage } from "astro:assets";
+import type { Shot } from "../data/games";
+import { toLocale, useTranslations } from "../i18n";
+
+interface Props {
+  shots: Shot[];
+  note?: string;
+}
+
+const { shots, note } = Astro.props;
+const t = useTranslations(toLocale(Astro.currentLocale));
+const full = await Promise.all(
+  shots.map((shot) => getImage({ src: shot.image, width: 1920, format: "webp", quality: 85 })),
+);
+---
+
+<div class="gallery" data-gallery>
+  <div class="gallery__stage">
+    {
+      shots.map((shot, index) => (
+        <Image
+          class="gallery__image"
+          src={shot.image}
+          alt={shot.alt}
+          widths={[480, 720, 960, 1280, 1920]}
+          sizes="(min-width: 64rem) 46rem, 100vw"
+          format="webp"
+          quality={82}
+          hidden={index !== 0}
+          data-gallery-image
+        />
+      ))
+    }
+  </div>
+  <ul class="gallery__thumbs" aria-label={t.games.shots}>
+    {
+      shots.map((shot, index) => (
+        <li>
+          <a
+            class="gallery__thumb"
+            href={full[index]!.src}
+            aria-current={index === 0 ? "true" : undefined}
+            data-gallery-thumb
+          >
+            <Image src={shot.image} alt="" width={320} format="webp" quality={72} />
+            <span class="sr-only">{`${t.games.showShot} ${index + 1}: ${shot.label}`}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  {note && <p class="gallery__note">{note}</p>}
+</div>
+
+<script>
+  for (const gallery of document.querySelectorAll<HTMLElement>("[data-gallery]")) {
+    const images = [...gallery.querySelectorAll<HTMLImageElement>("[data-gallery-image]")];
+    const thumbs = [...gallery.querySelectorAll<HTMLAnchorElement>("[data-gallery-thumb]")];
+
+    const show = (index: number) => {
+      images.forEach((image, i) => {
+        image.hidden = i !== index;
+      });
+      thumbs.forEach((thumb, i) => {
+        if (i === index) thumb.setAttribute("aria-current", "true");
+        else thumb.removeAttribute("aria-current");
+      });
+    };
+
+    thumbs.forEach((thumb, index) => {
+      // A hidden picture is not fetched until it is shown: start as soon as its button is pointed at.
+      const warm = () => {
+        const image = images[index];
+        if (image) image.loading = "eager";
+      };
+      thumb.addEventListener("pointerenter", warm, { once: true });
+      thumb.addEventListener("focus", warm, { once: true });
+
+      thumb.addEventListener("click", (event) => {
+        // A click with a modifier key opens the full picture, as a link does.
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!still && "startViewTransition" in document) document.startViewTransition(() => show(index));
+        else show(index);
+      });
+    });
+  }
+</script>
+
+<style>
+  .gallery__stage {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--midnight);
+    outline: 1px solid var(--line-strong);
+    overflow: hidden;
+  }
+
+  .gallery__stage :global(.gallery__image) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gallery__stage :global(.gallery__image[hidden]) {
+    display: none;
+  }
+
+  .gallery__thumbs {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .gallery__thumb {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+    background: var(--midnight);
+    outline: 1px solid var(--line);
+    opacity: 0.55;
+    transition:
+      opacity 0.15s ease,
+      outline-color 0.15s ease;
+  }
+
+  .gallery__thumb :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gallery__thumb:hover,
+  .gallery__thumb:focus-visible {
+    opacity: 1;
+  }
+
+  .gallery__thumb[aria-current="true"] {
+    opacity: 1;
+    outline: 2px solid var(--azure);
+  }
+
+  .gallery__note {
+    margin-top: 0.75rem;
+    color: var(--text-dim);
+    font-size: 0.875rem;
+  }
+
+  /* On a phone the small pictures keep a size a thumb can hit, and the row scrolls. */
+  @media (max-width: 40rem) {
+    .gallery__thumbs {
+      grid-auto-columns: 6.5rem;
+      overflow-x: auto;
+      padding: 2px;
+      margin-inline: -2px;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+    }
+
+    .gallery__thumbs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .gallery__thumbs li {
+      scroll-snap-align: start;
+    }
+  }
+</style>

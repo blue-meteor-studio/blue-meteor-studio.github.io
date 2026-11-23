@@ -1,0 +1,84 @@
+---
+// Links to this page in each language. A click is remembered (see the script in Base.astro), so the
+// root page does not send a visitor back to the language their browser asks for.
+import { getRelativeLocaleUrl } from "astro:i18n";
+import { localeNames, localeShort, locales, toLocale, useTranslations } from "../i18n";
+
+interface Props {
+  /** The page's path inside a language, "" for the home page. */
+  path?: string;
+  /** Whole names ("English") instead of codes ("EN"). */
+  full?: boolean;
+}
+
+const { path = "", full = false } = Astro.props;
+const locale = toLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+---
+
+<div class:list={["lang", { "lang--full": full }]} role="group" aria-label={t.a11y.language}>
+  {
+    locales.map((code) => (
+      <a
+        class="lang__link"
+        href={getRelativeLocaleUrl(code, path)}
+        hreflang={code}
+        lang={code}
+        data-lang={code}
+        aria-current={code === locale ? "true" : undefined}
+      >
+        {full ? (
+          localeNames[code]
+        ) : (
+          <>
+            <span aria-hidden="true">{localeShort[code]}</span>
+            <span class="sr-only">{localeNames[code]}</span>
+          </>
+        )}
+      </a>
+    ))
+  }
+</div>
+
+<style>
+  .lang {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--line-strong);
+  }
+
+  .lang__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.25rem;
+    padding: 0 0.7rem;
+    color: var(--text-dim);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease;
+  }
+
+  .lang--full .lang__link {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    padding: 0 0.9rem;
+  }
+
+  .lang__link:hover {
+    color: var(--text);
+  }
+
+  .lang__link[aria-current="true"] {
+    background: var(--dusk);
+    color: var(--text);
+  }
+</style>

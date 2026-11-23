@@ -1,0 +1,330 @@
+/* Tokens, reset and the few classes every component shares. Component styles live in their components. */
+
+:root {
+  color-scheme: dark;
+
+  /* The palette of Last Marble Crusher, which the studio's site shares. */
+  --void: #080a18;
+  --midnight: #10132a;
+  --night: #1a1f40;
+  --dusk: #252c57;
+  --royal: #1d4ed8;
+  --azure: #5b8cff;
+  --frost: #6fd3ff;
+  --core: #e9fbf6;
+  --moon: #c9d6ff;
+  --mint: #35e6c4;
+  --coral: #f2476e;
+  --ember: #ff7a2e;
+
+  --bg: var(--void);
+  --surface: var(--midnight);
+  --surface-raised: var(--night);
+  --line: rgb(201 214 255 / 0.14);
+  --line-strong: rgb(201 214 255 / 0.3);
+  --text: var(--core);
+  --text-soft: #b9c4ea;
+  --text-dim: #8f9bc8;
+  --accent: var(--azure);
+
+  --font-body:
+    system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Barlow Condensed has no Hangul: Korean in a display line is drawn by the system's own font. */
+  --font-display: var(--font-barlow-condensed), var(--font-body);
+
+  --gutter: clamp(1.25rem, 4vw, 2.5rem);
+  --content: 72rem;
+  --header-h: 3.75rem;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--text-soft);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Korean breaks between words, not inside them. */
+:lang(ko) {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  line-break: strict;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+dl,
+dd,
+figure {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--text);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+:focus-visible {
+  outline: 2px solid var(--frost);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--azure);
+  color: var(--void);
+}
+
+/* ---- shared classes ---- */
+
+.container {
+  width: min(100% - 2 * var(--gutter), var(--content));
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: clamp(4.5rem, 11vw, 8.5rem);
+}
+
+/* The display face: heavy, slanted capitals, as on the game's own title. Hangul stays upright. */
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-style: italic;
+  font-synthesis: none;
+  text-transform: uppercase;
+  line-height: 0.92;
+  letter-spacing: 0.005em;
+}
+
+.display:lang(ko) {
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+.accent {
+  color: var(--accent);
+}
+
+.section-title {
+  font-size: clamp(2.75rem, 7vw, 4.75rem);
+}
+
+.label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.label:lang(ko) {
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+}
+
+/* A small flat tag: "in development". */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.3em 0.7em 0.28em;
+  background: rgb(53 230 196 / 0.12);
+  color: var(--mint);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.chip:lang(ko) {
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+}
+
+.chip::before {
+  content: "";
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Buttons are straight rectangles, as in the game. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  min-height: 3.5rem;
+  padding: 0.5rem 1.75rem;
+  border: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.375rem;
+  line-height: 1.1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.button:lang(ko) {
+  font-size: 1.125rem;
+  letter-spacing: 0.02em;
+}
+
+.button--primary {
+  background: var(--azure);
+  color: var(--void);
+  box-shadow: 0 0 0 6px rgb(91 140 255 / 0.28);
+}
+
+.button--primary:hover {
+  background: #7ba3ff;
+  box-shadow: 0 0 0 9px rgb(91 140 255 / 0.3);
+}
+
+.button--primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 0 4px rgb(91 140 255 / 0.3);
+}
+
+.button svg {
+  width: 1em;
+  height: 1em;
+  flex: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip {
+  position: absolute;
+  left: var(--gutter);
+  top: 0.5rem;
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  background: var(--azure);
+  color: var(--void);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip:focus-visible {
+  transform: none;
+}
+
+/* Sections rise a little as they come into view, where the browser can tie an animation to scrolling. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 38%;
+    }
+
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        transform: translateY(1.75rem);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
