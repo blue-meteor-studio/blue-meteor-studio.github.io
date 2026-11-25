@@ -1,7 +1,7 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n";
 import LanguageSwitch from "./LanguageSwitch.astro";
-import Logo from "./Logo.astro";
+import Wordmark from "./Wordmark.astro";
 import { games } from "../data/games";
 import { site, toLocale, useTranslations } from "../i18n";
 
@@ -21,8 +21,7 @@ const year = new Date().getFullYear();
   <div class="footer__grid container">
     <div class="footer__brand">
       <a class="footer__logo" href={`${home}#top`} aria-label={t.a11y.home}>
-        <Logo size={36} class="footer__mark" />
-        <span class="footer__name display" lang="en">{site.name}</span>
+        <Wordmark class="footer__name" />
       </a>
       <p class="footer__tagline">{t.footer.tagline}</p>
     </div>
@@ -85,25 +84,16 @@ const year = new Date().getFullYear();
 
   .footer__logo {
     display: inline-flex;
-    align-items: center;
-    gap: 0.7rem;
     color: var(--text);
     text-decoration: none;
   }
 
-  .footer__logo :global(.footer__mark) {
-    color: var(--azure);
-    flex: none;
-  }
-
-  .footer__name {
-    font-size: 1.75rem;
-    line-height: 1;
-    letter-spacing: 0.02em;
+  .footer__logo :global(.footer__name) {
+    font-size: 1.625rem;
   }
 
   .footer__tagline {
-    margin-top: 0.75rem;
+    margin-top: 1rem;
     color: var(--text-dim);
   }
 

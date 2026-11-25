@@ -1,0 +1,90 @@
+---
+// The studio's name as its wordmark: the title in wide-set capitals, with the "o" of Meteor drawn as
+// the logo (a ring in the text colour with a crescent of blue light), and the last word, "Studio",
+// small and centred beneath it. The letter "o" itself stays in the text, for copying and search.
+// The wordmark is as large as the font-size of the place it is put in, and takes its text colour.
+import Logo from "./Logo.astro";
+import { site } from "../i18n";
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const words = site.name.split(" ");
+const descriptor = words.length > 1 ? words[words.length - 1] : "";
+const title = descriptor ? words.slice(0, -1).join(" ") : site.name;
+const meteorAt = title.indexOf("Meteor");
+const meteorO =
+  meteorAt < 0
+    ? null
+    : {
+        before: title.slice(0, meteorAt + 4),
+        letter: title.charAt(meteorAt + 4),
+        after: title.slice(meteorAt + 5),
+      };
+---
+
+<span class:list={["wordmark", className]} lang="en">
+  <span class="wordmark__title"
+    >{
+      meteorO ? (
+        <Fragment>{meteorO.before}<span class="sr-only">{meteorO.letter}</span><Logo frame="letter" class="wordmark__o" />{meteorO.after}</Fragment>
+      ) : (
+        title
+      )
+    }</span
+  >
+  {
+    /* The space is not drawn (the two lines are flex items); it keeps the words apart in the text. */
+    descriptor && (
+      <Fragment>
+        {" "}
+        <span class="wordmark__sub">{descriptor}</span>
+      </Fragment>
+    )
+  }
+</span>
+
+<style>
+  /* Two lines, the second centred under the first. */
+  .wordmark {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: var(--font-wordmark);
+    font-weight: 500;
+    font-style: normal;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* Wide-set capitals. The spacing after the last letter would push the line off centre, so it is taken back. */
+  .wordmark__title {
+    margin-right: -0.28em;
+    letter-spacing: 0.28em;
+  }
+
+  /* 8 for every 22 of the title's size, and as far beneath the title as its own height.
+     The ratio is kept in a variable so that the build cannot round it: 22 / 2.75 is exactly 8. */
+  .wordmark__sub {
+    --ratio: 2.75;
+    margin-top: 1em;
+    margin-right: -0.74em;
+    color: var(--moon);
+    font-size: calc(1em / var(--ratio));
+    letter-spacing: 0.74em;
+  }
+
+  /* The logo, standing in for the letter "O" (the letter itself is kept, hidden, beside it).
+     As tall as a capital. The crescent of light hangs outside the ring, into the space before the next letter. */
+  .wordmark__title :global(.wordmark__o) {
+    display: inline-block;
+    width: 0.73em;
+    height: 0.73em;
+    margin: 0 0.3em -0.012em 0.02em;
+    vertical-align: baseline;
+  }
+</style>

@@ -1,24 +1,33 @@
 ---
-// The studio's mark: a blue meteor. It takes its colour from the text colour around it.
+// The studio's logo: a ring (the meteor, falling to the lower right) and a crescent of blue light
+// where it pushes the air aside. One drawing, framed in two ways:
+//   "symbol": the whole drawing in a square with a margin, to stand on its own.
+//   "letter": the ring fills the box, to stand among letters as the "O" of the name; the crescent
+//             hangs outside the box, so the box is not clipped. Its size is set in CSS, in em.
+// The ring takes the colour of the text around it; the light is always the brand's blue.
+import { logoColors, logoFrames, logoShapes } from "./logo-shapes";
+
 interface Props {
+  frame?: keyof typeof logoFrames;
+  /** Width and height in pixels. A symbol is 32 unless told otherwise; a letter has no size of its own. */
   size?: number;
   class?: string;
 }
 
-const { size = 32, class: className } = Astro.props;
+const { frame = "symbol", size, class: className } = Astro.props;
+const pixels = size ?? (frame === "symbol" ? 32 : undefined);
+const { ring } = logoShapes;
 ---
 
 <svg
   class={className}
-  width={size}
-  height={size}
-  viewBox="0 0 64 64"
-  fill="none"
+  width={pixels}
+  height={pixels}
+  viewBox={logoFrames[frame]}
+  style={frame === "letter" ? "overflow: visible" : undefined}
   aria-hidden="true"
   focusable="false"
+  ><circle cx={ring.cx} cy={ring.cy} r={ring.r} fill="none" stroke="currentColor" stroke-width={ring.width}></circle><path
+    d={logoShapes.light}
+    fill={logoColors.light}></path></svg
 >
-  <path d="M12.81 32.81 60 4 31.19 51.19Z" fill="currentColor" opacity=".38"></path>
-  <path d="M17.05 37.05 48 16 26.95 46.95Z" fill="currentColor" opacity=".6"></path>
-  <circle cx="22" cy="42" r="13" fill="currentColor"></circle>
-  <circle cx="17.5" cy="37.5" r="4" fill="#fff" opacity=".6"></circle>
-</svg>

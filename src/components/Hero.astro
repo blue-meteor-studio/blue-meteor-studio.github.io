@@ -1,6 +1,8 @@
 ---
-// The top of the page: the studio's name over a night sky, a blue meteor coming down on an arena floor.
+// The top of the page: the studio's name in a night sky, standing over the horizon of an arena floor.
+// A thin trail of light comes down from the upper left and ends on the "O" of the name: the meteor.
 // Everything drawn here is decoration (aria-hidden); the words are the content.
+import Wordmark from "./Wordmark.astro";
 import { games } from "../data/games";
 import { toLocale, useTranslations } from "../i18n";
 
@@ -50,101 +52,49 @@ const stars = Array.from({ length: 120 }, () => {
     <span class="hero__streak hero__streak--a"></span>
     <span class="hero__streak hero__streak--b"></span>
     <span class="hero__streak hero__streak--c"></span>
-
-    <div class="hero__floor">
-      <div class="hero__grid"></div>
-    </div>
-    <div class="hero__horizon"></div>
-
-    <div class="hero__meteor">
-      <!-- Still: drawn once. The blurred tails would be costly to redraw every frame. -->
-      <svg viewBox="0 0 800 560" focusable="false">
-        <defs>
-          <filter id="hero-blur-wide" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="26"></feGaussianBlur>
-          </filter>
-          <filter id="hero-blur" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="7"></feGaussianBlur>
-          </filter>
-          <filter id="hero-blur-fine" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="2.5"></feGaussianBlur>
-          </filter>
-          <linearGradient id="hero-tail" gradientUnits="userSpaceOnUse" x1="250" y1="380" x2="830" y2="12">
-            <stop offset="0" stop-color="#6c9bff"></stop>
-            <stop offset=".3" stop-color="#4674f2" stop-opacity=".62"></stop>
-            <stop offset=".72" stop-color="#2d5be0" stop-opacity=".2"></stop>
-            <stop offset="1" stop-color="#1d4ed8" stop-opacity="0"></stop>
-          </linearGradient>
-          <linearGradient id="hero-tail-core" gradientUnits="userSpaceOnUse" x1="250" y1="380" x2="640" y2="132">
-            <stop offset="0" stop-color="#ffffff"></stop>
-            <stop offset=".3" stop-color="#a5e2ff" stop-opacity=".8"></stop>
-            <stop offset="1" stop-color="#6fd3ff" stop-opacity="0"></stop>
-          </linearGradient>
-          <radialGradient id="hero-glow" gradientUnits="userSpaceOnUse" cx="250" cy="380" r="250">
-            <stop offset="0" stop-color="#6c9bff" stop-opacity=".62"></stop>
-            <stop offset=".4" stop-color="#3d6df0" stop-opacity=".2"></stop>
-            <stop offset="1" stop-color="#1d4ed8" stop-opacity="0"></stop>
-          </radialGradient>
-          <radialGradient id="hero-head" gradientUnits="userSpaceOnUse" cx="238" cy="392" r="74">
-            <stop offset="0" stop-color="#ffffff"></stop>
-            <stop offset=".3" stop-color="#d2ecff"></stop>
-            <stop offset=".66" stop-color="#77a3ff"></stop>
-            <stop offset="1" stop-color="#3f70ea"></stop>
-          </radialGradient>
-        </defs>
-        <circle cx="250" cy="380" r="250" fill="url(#hero-glow)"></circle>
-        <path d="M204.9 309.13 830 12 295.1 450.87Z" fill="url(#hero-tail)" opacity=".55" filter="url(#hero-blur-wide)"></path>
-        <path d="M219.93 332.75 830 12 280.07 427.25Z" fill="url(#hero-tail)" filter="url(#hero-blur)"></path>
-        <path d="M237.11 359.75 640 132 262.89 400.25Z" fill="url(#hero-tail-core)" filter="url(#hero-blur-fine)"></path>
-        <circle cx="250" cy="380" r="56" fill="url(#hero-head)"></circle>
-        <ellipse cx="229" cy="355" rx="15" ry="9" transform="rotate(-35 229 355)" fill="#fff" opacity=".5"></ellipse>
-      </svg>
-      <!-- Moving: sparks that fall behind along the tail. -->
-      <svg class="hero__sparks" viewBox="0 0 800 560" focusable="false">
-        <g fill="#d2ecff">
-          <circle class="spark spark--1" cx="388.4" cy="318.1" r="3.6"></circle>
-          <circle class="spark spark--2" cx="442.8" cy="235.9" r="2.8"></circle>
-          <circle class="spark spark--3" cx="534.8" cy="212.9" r="2.3"></circle>
-          <circle class="spark spark--4" cx="607.4" cy="140.7" r="1.9"></circle>
-          <circle class="spark spark--5" cx="691.9" cy="105.9" r="1.5"></circle>
-        </g>
-      </svg>
-    </div>
-
-    <div class="hero__shade"></div>
   </div>
 
-  <div class="hero__content container">
-    <h1 class="hero__title display" lang="en">
-      <span>Blue</span> <span class="accent">Meteor</span> <span>Studio</span>
+  <div class="hero__sky container">
+    <h1 class="hero__title">
+      <Wordmark />
+      <span class="hero__trail" aria-hidden="true"><span></span></span>
     </h1>
-    <p class="hero__lead">{t.hero.lead}</p>
-    <div class="hero__actions">
-      <a class="button button--primary" href="#games">{t.hero.cta}</a>
+  </div>
+
+  <div class="hero__ground">
+    <div class="hero__floor" aria-hidden="true">
+      <div class="hero__grid"></div>
     </div>
-    <p class="hero__now">
-      <span class="chip">{t.hero.nowLabel}</span>
-      <span class="hero__now-list" lang="en">
-        {games.map((game) => <a href={`#${game.id}`}>{game.title}</a>)}
-      </span>
-    </p>
+    <div class="hero__content container">
+      <p class="hero__lead">{t.hero.lead}</p>
+      <div class="hero__actions">
+        <a class="button button--primary" href="#games">{t.hero.cta}</a>
+      </div>
+      <p class="hero__now">
+        <span class="chip">{t.hero.nowLabel}</span>
+        <span class="hero__now-list" lang="en">
+          {games.map((game) => <a href={`#${game.id}`}>{game.title}</a>)}
+        </span>
+      </p>
+    </div>
   </div>
 </section>
 
 <style>
+  /* Two parts, one above the other: the sky, which takes the room that is left and holds the name,
+     and the ground, which is as tall as its words need. The horizon is the line between them. */
   .hero {
     position: relative;
     isolation: isolate;
-    display: grid;
-    align-items: end;
+    display: flex;
+    flex-direction: column;
     min-height: clamp(34rem, 100svh, 60rem);
     /* The sky runs up behind the header. */
     margin-top: calc(var(--header-h) * -1);
-    padding-top: calc(var(--header-h) + 2rem);
-    padding-bottom: clamp(2.5rem, 8svh, 5.5rem);
+    padding-top: var(--header-h);
     overflow: clip;
     background:
-      radial-gradient(90% 70% at 78% 8%, rgb(29 78 216 / 0.22), transparent 62%),
+      radial-gradient(90% 70% at 24% 6%, rgb(29 78 216 / 0.2), transparent 62%),
       linear-gradient(180deg, #060815 0%, var(--void) 55%, #0b1030 100%);
   }
 
@@ -182,60 +132,176 @@ const stars = Array.from({ length: 120 }, () => {
     }
   }
 
-  /* Thin streaks cross the sky now and then, the way the meteor came. */
+  /* Thin streaks cross the sky now and then, the way the meteor came: down to the right. */
   .hero__streak {
     position: absolute;
-    width: 9rem;
+    width: 8rem;
     height: 2px;
-    background: linear-gradient(90deg, var(--frost), transparent);
+    background: linear-gradient(90deg, transparent, var(--frost));
     opacity: 0;
-    rotate: -32.5deg;
+    rotate: 45deg;
     animation: streak 13s linear infinite;
   }
 
   .hero__streak--a {
-    left: 62%;
-    top: 14%;
-    animation-delay: 2.5s;
+    left: 18%;
+    top: 12%;
+    animation-delay: 4s;
   }
 
   .hero__streak--b {
-    left: 34%;
-    top: 9%;
-    width: 6rem;
-    animation-delay: 7s;
+    left: 66%;
+    top: 8%;
+    width: 5.5rem;
+    animation-delay: 8.5s;
   }
 
   .hero__streak--c {
-    left: 88%;
+    left: 84%;
     top: 30%;
-    width: 7rem;
-    animation-delay: 10.5s;
+    width: 6.5rem;
+    animation-delay: 12s;
   }
 
   @keyframes streak {
     0% {
       opacity: 0;
-      translate: 9rem -5.7rem;
+      translate: -6rem -6rem;
     }
     1.5% {
-      opacity: 0.9;
+      opacity: 0.85;
     }
     7% {
       opacity: 0;
-      translate: -13rem 8.3rem;
+      translate: 9rem 9rem;
     }
     100% {
       opacity: 0;
-      translate: -13rem 8.3rem;
+      translate: 9rem 9rem;
     }
+  }
+
+  .hero__sky {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* The name stands just above the horizon, with the whole sky over it. */
+    justify-content: flex-end;
+    padding-bottom: clamp(2rem, 5.5svh, 3.75rem);
+    /* The trail fades out towards the top of the sky, whatever the window's height: it does not end
+       at the header's edge. The space above the name is at least as tall as the fade, so the name
+       itself is never faded. */
+    padding-top: 7rem;
+    mask-image: linear-gradient(180deg, transparent 0.5rem, #000 6.5rem);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0.5rem, #000 6.5rem);
+  }
+
+  /* The studio's wordmark. It is about 9.3 times as wide as its font-size: as large as the page's
+     width allows, up to a limit that grows a little with the window. */
+  .hero__title {
+    position: relative;
+    display: flex;
+    font-size: clamp(1.75rem, min(calc((100vw - 2 * var(--gutter)) / 9.4), max(4.5rem, 5.6vw)), 7.5rem);
+    line-height: 1;
+    text-shadow: 0 0.04em 0.5em rgb(8 10 24 / 0.6);
+  }
+
+  /* The meteor's trail: a thin wedge of light that comes down at 45 degrees and ends on the upper
+     left edge of the ring that is the "O" of the name. That point is 7.745em from the left of the
+     wordmark and 0.236em from its top (the ring's centre is at 8.003em, 0.494em; its radius is 0.365em).
+     The outer box is turned about that point; the inner one is the light itself. */
+  .hero__trail {
+    position: absolute;
+    left: calc(7.745em - var(--trail));
+    top: calc(0.236em - var(--trail-w) / 2);
+    width: var(--trail);
+    height: var(--trail-w);
+    transform-origin: 100% 50%;
+    rotate: 45deg;
+    pointer-events: none;
+    --trail: max(11em, 22rem);
+    --trail-w: max(2px, 0.034em);
+  }
+
+  .hero__trail span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      rgb(91 140 255 / 0) 0%,
+      rgb(91 140 255 / 0) 22%,
+      rgb(91 140 255 / 0.5) 80%,
+      rgb(201 214 255 / 0.9) 96%,
+      rgb(233 251 246 / 0.95) 100%
+    );
+    /* A point at the far end, full width where it meets the ring. */
+    clip-path: polygon(0 50%, 100% 0, 100% 100%);
+    transform-origin: 0 50%;
+  }
+
+  /* On arrival the trail is drawn from the sky down to the ring, and then the air in front of the ring lights up.
+     (Animation names are shared by the whole page: these two are named for the trail so that they meet no other.) */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__trail span {
+      animation: trail-fall 1.1s cubic-bezier(0.3, 0, 0.2, 1) 0.25s both;
+    }
+
+    .hero__title :global(.wordmark__o path) {
+      animation: trail-light 0.7s ease-out 1.15s both;
+    }
+  }
+
+  @keyframes trail-fall {
+    from {
+      scale: 0 1;
+      opacity: 0;
+    }
+    30% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes trail-light {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .hero__ground {
+    position: relative;
+    isolation: isolate;
+    padding-top: clamp(2rem, 5svh, 3.25rem);
+    padding-bottom: clamp(2.5rem, 8svh, 5.5rem);
+  }
+
+  /* The horizon. */
+  .hero__ground::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(111 211 255 / 0.55) 30%, rgb(111 211 255 / 0.55) 70%, transparent);
+    box-shadow: 0 0 2.5rem 0.6rem rgb(91 140 255 / 0.22);
+  }
+
+  /* Darkens the floor under the words and where the next section begins. */
+  .hero__ground::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(60% 90% at 50% 48%, rgb(8 10 24 / 0.6), transparent 72%),
+      linear-gradient(0deg, rgb(8 10 24 / 0.7) 0%, transparent 45%);
   }
 
   /* The arena floor: a lit grid that runs to the horizon. */
   .hero__floor {
     position: absolute;
-    inset: auto 0 0 0;
-    height: 38%;
+    inset: 0;
+    z-index: -2;
     overflow: clip;
     perspective: 26rem;
     perspective-origin: 50% 0%;
@@ -265,107 +331,14 @@ const stars = Array.from({ length: 120 }, () => {
     }
   }
 
-  .hero__horizon {
-    position: absolute;
-    inset: auto 0 38% 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgb(111 211 255 / 0.55) 30%, rgb(111 211 255 / 0.55) 70%, transparent);
-    box-shadow: 0 0 2.5rem 0.6rem rgb(91 140 255 / 0.22);
-  }
-
-  .hero__meteor {
-    position: absolute;
-    top: 4%;
-    right: -6%;
-    width: min(64vw, 56rem);
-    aspect-ratio: 800 / 560;
-    animation:
-      arrive 1.3s var(--ease-out) both,
-      hover 5s ease-in-out 1.3s infinite alternate;
-  }
-
-  .hero__meteor svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-
-  /* It comes in along its own tail: 800 across and 509 down for every 800 of its width. */
-  @keyframes arrive {
-    from {
-      opacity: 0;
-      translate: 60% -54.5%;
-    }
-  }
-
-  @keyframes hover {
-    to {
-      translate: 1.2% -1.1%;
-    }
-  }
-
-  .spark {
-    transform-box: fill-box;
-    animation: spark 2.4s linear infinite;
-  }
-
-  .spark--2 {
-    animation-delay: -0.5s;
-    animation-duration: 2.9s;
-  }
-
-  .spark--3 {
-    animation-delay: -1.3s;
-  }
-
-  .spark--4 {
-    animation-delay: -0.9s;
-    animation-duration: 3.2s;
-  }
-
-  .spark--5 {
-    animation-delay: -1.9s;
-  }
-
-  @keyframes spark {
-    from {
-      opacity: 0;
-      translate: -42px 27px;
-    }
-    25% {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-      translate: 64px -41px;
-    }
-  }
-
-  /* Darkens the floor under the words. */
-  .hero__shade {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(90deg, rgb(8 10 24 / 0.82) 0%, rgb(8 10 24 / 0.45) 42%, transparent 68%),
-      linear-gradient(0deg, rgb(8 10 24 / 0.7) 0%, transparent 26%);
-  }
-
-  .hero__title {
-    /* As large as the window allows, in both directions: the whole hero fits the first screen. */
-    font-size: clamp(4.5rem, min(22vw, 17.5svh), 11rem);
-    line-height: 0.84;
-    letter-spacing: -0.005em;
-    text-shadow: 0 0.04em 0.5em rgb(8 10 24 / 0.6);
-  }
-
-  .hero__title span {
-    display: block;
+  .hero__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
   .hero__lead {
-    margin-top: clamp(1.25rem, 3vw, 2rem);
     color: var(--text);
     font-size: clamp(1.25rem, 2.6vw, 1.75rem);
     font-weight: 600;
@@ -375,23 +348,24 @@ const stars = Array.from({ length: 120 }, () => {
   .hero__actions {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 1rem;
-    margin-top: clamp(1.75rem, 4vw, 2.5rem);
-    /* Room for the button's frame. */
-    padding-left: 6px;
+    margin-top: clamp(1.5rem, 4vw, 2.25rem);
   }
 
   .hero__now {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem 0.9rem;
-    margin-top: clamp(1.5rem, 4.5svh, 3rem);
+    justify-content: center;
+    gap: 0.6rem 0.9rem;
+    margin-top: clamp(1.75rem, 4.5svh, 3rem);
   }
 
   .hero__now-list {
     display: inline-flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 0.15rem 1.4rem;
     color: var(--text-soft);
     font-family: var(--font-display);
@@ -421,33 +395,5 @@ const stars = Array.from({ length: 120 }, () => {
   .hero__now-list a:hover {
     color: var(--text);
     text-decoration: underline;
-  }
-
-  @media (max-width: 47.99rem) {
-    .hero {
-      /* The meteor has the sky above the words to itself. */
-      --hero-sky: clamp(7rem, 24svh, 15rem);
-      padding-top: calc(var(--header-h) + var(--hero-sky));
-    }
-
-    /* 150vw wide, so 105vw tall, and its head ends 77.86% of the way down: placed so that the head
-       stops just short of the first word, whatever the window's height. */
-    .hero__meteor {
-      top: calc(var(--header-h) + var(--hero-sky) - 81.75vw - 0.75rem);
-      right: -50%;
-      width: 150vw;
-    }
-
-    .hero__shade {
-      background: linear-gradient(0deg, rgb(8 10 24 / 0.88) 0%, rgb(8 10 24 / 0.5) 34%, transparent 62%);
-    }
-
-    .hero__floor {
-      height: 30%;
-    }
-
-    .hero__horizon {
-      bottom: 30%;
-    }
   }
 </style>

@@ -22,9 +22,25 @@ export default defineConfig({
     }),
   ],
 
-  // The display face. The files are in the repository (src/assets/fonts), so a build fetches nothing.
+  // The display face, and the face of the studio's name (its wordmark). The files are in the
+  // repository (src/assets/fonts), so a build fetches nothing.
   // Korean text falls through to the reader's own system font.
   fonts: [
+    {
+      provider: fontProviders.local(),
+      name: "Jost",
+      cssVariable: "--font-jost",
+      fallbacks: ["sans-serif"],
+      options: {
+        variants: [
+          {
+            src: ["./src/assets/fonts/jost-latin-500-normal.woff2"],
+            weight: 500,
+            style: "normal",
+          },
+        ],
+      },
+    },
     {
       provider: fontProviders.local(),
       name: "Barlow Condensed",
