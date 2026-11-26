@@ -5,10 +5,11 @@
 //   "letter": the ring fills the box, to stand among letters as the "O" of the name; the crescent
 //             hangs outside the box, so the box is not clipped. Its size is set in CSS, in em.
 // The ring takes the colour of the text around it; the light is always the brand's blue.
-import { logoColors, logoFrames, logoShapes } from "./logo-shapes";
+// The drawing itself (its numbers and colours) is kept with the brand's sources, not here.
+import { colors, logo } from "../../brand/source/logo.mjs";
 
 interface Props {
-  frame?: keyof typeof logoFrames;
+  frame?: keyof typeof logo.frames;
   /** Width and height in pixels. A symbol is 32 unless told otherwise; a letter has no size of its own. */
   size?: number;
   class?: string;
@@ -16,18 +17,18 @@ interface Props {
 
 const { frame = "symbol", size, class: className } = Astro.props;
 const pixels = size ?? (frame === "symbol" ? 32 : undefined);
-const { ring } = logoShapes;
+const { ring } = logo;
 ---
 
 <svg
   class={className}
   width={pixels}
   height={pixels}
-  viewBox={logoFrames[frame]}
+  viewBox={logo.frames[frame]}
   style={frame === "letter" ? "overflow: visible" : undefined}
   aria-hidden="true"
   focusable="false"
   ><circle cx={ring.cx} cy={ring.cy} r={ring.r} fill="none" stroke="currentColor" stroke-width={ring.width}></circle><path
-    d={logoShapes.light}
-    fill={logoColors.light}></path></svg
+    d={logo.light}
+    fill={colors.light}></path></svg
 >

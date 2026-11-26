@@ -21,6 +21,7 @@ npm install        # 처음 한 번
 npm run dev        # 개발 서버: http://localhost:4321
 npm run build      # 타입 검사(astro check) 후 dist/ 에 빌드. 배포도 이 명령을 쓴다
 npm run preview    # 빌드한 dist/ 를 그대로 띄워 본다
+npm run brand      # 로고의 원본에서 brand/ 와 public/ 의 그림을 다시 만든다 (brand/README.md)
 ```
 
 ## 폴더
@@ -35,8 +36,8 @@ npm run preview    # 빌드한 dist/ 를 그대로 띄워 본다
 | `src/styles/global.css` | 색과 글꼴 변수, 공통 클래스(`.button`, `.chip`, `.display` …) |
 | `src/assets/games/<게임>/<언어>/` | 스크린샷 원본(1920×1080 WebP). 빌드가 크기별로 줄여 낸다 |
 | `src/assets/fonts/` | 글꼴 파일과 라이선스(OFL): Barlow Condensed(제목), Jost(스튜디오 이름) |
-| `public/` | 그대로 올라가는 파일: 파비콘, 공유 이미지 `og.png`, `robots.txt` |
-| `brand/` | 로고 원본(SVG). 빌드에는 쓰이지 않는다. 아래 "로고" 참고 |
+| `public/` | 그대로 올라가는 파일: 파비콘, 공유 이미지 `og.png`, `robots.txt`. 그림은 `npm run brand`가 만든다 |
+| `brand/` | 로고와 이름 글자형의 원본(`brand/source/`)과 거기서 만든 파일(SVG). 고치는 법은 `brand/README.md` |
 
 ## 로고
 
@@ -51,14 +52,15 @@ npm run preview    # 빌드한 dist/ 를 그대로 띄워 본다
 | `logo-mark-on-dark.svg` | 어두운 배경. 사이트가 쓰는 색이다 |
 | `logo-mark-on-light.svg` | 흰 배경과 밝은 배경 |
 | `logo-mark-mono-white.svg`, `logo-mark-mono-navy.svg` | 색을 하나만 쓸 수 있을 때 |
+| `wordmark-on-dark.svg`, `wordmark-on-light.svg`, `wordmark-mono-white.svg`, `wordmark-mono-navy.svg` | 이름 글자형(BLUE METEOR / STUDIO)을 같은 네 가지 색으로. 글자가 윤곽선이라 글꼴 없이도 열린다 |
 
-사이트 코드에서 로고의 모양과 색은 `src/components/logo-shapes.ts` 한 곳에 있고, `src/components/Logo.astro`가 그것을 그린다.
+로고의 모양과 색은 `brand/source/logo.mjs` 한 곳에 있다. 사이트(`src/components/Logo.astro`)는 그 파일을 읽어서 그리고, `brand/`와 `public/`의 그림은 `npm run brand`가 그 파일에서 만든다. 원본이 무엇이고 무엇을 바꾸려면 어디를 고치는지는 `brand/README.md`에 있다.
 
 - 이름 글자형(`Wordmark.astro`): 사이트에서 스튜디오 이름을 그릴 때는 언제나 이것을 쓴다. Jost 글꼴의 자간 넓은 대문자 BLUE METEOR에서 O 자리에 로고를 놓고(`frame="letter"`), STUDIO를 그 아래 가운데에 작게 놓는다. 글자 O는 복사와 검색을 위해 화면 밖에 그대로 남겨 둔다. 크기는 놓이는 곳의 글자 크기를 따른다. 헤더, 첫 화면의 제목, footer가 쓴다.
 - 로고만(`frame="symbol"`): 이름이 들어갈 자리가 없는 휴대폰 폭의 헤더.
-- 첫 화면(`Hero.astro`)에서는 왼쪽 위에서 내려온 가는 빛줄기가 이름의 O에 닿는다. 닿는 자리는 글자형 안에서 O가 놓인 위치를 재서 적어 둔 값이다(`.hero__trail`). 글자형의 자간이나 O의 크기를 바꾸면 그 값도 함께 고친다.
+- 첫 화면(`Hero.astro`)에서는 왼쪽 위에서 내려온 가는 빛줄기가 이름의 O에 닿는다. 닿는 자리는 글자형 안에서 O가 놓인 위치를 재서 적어 둔 값이다(`.hero__trail`). 글자형의 자간이나 O의 크기를 바꾸면 그 값도 함께 고친다(`npm run brand`가 새 값을 재서 알려 준다).
 
-`public/`의 파비콘(`favicon.svg`, `favicon-32.png`), 홈 화면 아이콘(`apple-touch-icon.png`), `icon-512.png`는 이 로고로 만든 그림이고, 공유 이미지(`og.png`)는 첫 화면과 같은 구성(이름 글자형과 빛줄기)으로 만든 그림이다. 파비콘은 32px에서 고리가 정확히 20px이 되게 놓았다(가장자리가 픽셀 경계에 맞아 또렷하다). 로고나 글자형을 바꾸면 `logo-shapes.ts`, `brand/`, `public/`의 그림을 함께 바꾼다.
+`public/`의 파비콘(`favicon.svg`, `favicon-32.png`), 홈 화면 아이콘(`apple-touch-icon.png`), `icon-512.png`는 이 로고로 만든 그림이고, 공유 이미지(`og.png`)는 첫 화면과 같은 구성(이름 글자형과 빛줄기)으로 만든 그림이다. 파비콘은 32px에서 고리가 정확히 20px이 되게 놓았다(가장자리가 픽셀 경계에 맞아 또렷하다). 이 그림들은 손으로 그린 것이 아니다. 로고나 글자형을 바꾸면 `npm run brand`로 다시 만든다.
 
 ## 무엇을 고치려면 어디를
 
@@ -69,5 +71,6 @@ npm run preview    # 빌드한 dist/ 를 그대로 띄워 본다
 | 게임 추가 | `src/data/games.ts`에 `Game`을 하나 더 만들어 `games`에 넣는다. 스크린샷이 있으면 `GameFeature`, 없으면 `GameTeaser`로 그린다(`src/components/Games.astro`) |
 | 소개 문구, 메뉴, footer 문구 | `src/i18n/index.ts` (영어 `en`과 한국어 `ko`를 함께 고친다. 키가 빠지면 타입 검사가 실패한다) |
 | 색, 글자 크기 | `src/styles/global.css`의 `:root` 변수 |
+| 로고, 이름 글자형, 아이콘, 공유 이미지 | `brand/README.md`의 표를 따른다. 원본을 고치고 `npm run brand` |
 | 언어 추가 | `src/i18n/index.ts`의 `locales`와 사전, `astro.config.mjs`의 `i18n.locales`와 sitemap, `src/pages/<언어>/index.astro`, `src/data/games.ts`의 언어별 문구 |
 | 주소(도메인) 변경 | `astro.config.mjs`의 `site`, `src/i18n/index.ts`의 `site.url`, `public/robots.txt` |
